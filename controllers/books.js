@@ -2,6 +2,7 @@ const Book = require('../models/Book');
 const fs = require('fs');
 
 exports.createBook = (req, res, next) => {
+  console.log("TEST", req.file)
   const bookOject = JSON.parse(req.body.book);
   delete bookOject._id;
   delete bookOject._userId;
