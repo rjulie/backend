@@ -17,6 +17,58 @@ exports.createBook = (req, res, next) => {
   .catch(error => { res.status(400).json( { error })})
 };
 
+
+exports.createRating = (req, res, next) => {
+  console.log("body", req.body)
+  console.log("rating", req.body.grade)
+  console.log("user", req.body.userId)
+  console.log("auth", req.auth.userId)
+
+
+  const user = req.body.userId;
+
+  if (user != req.auth.userId) {
+    res.status(401).json({ message : 'Not authorized'});
+  } else {
+    Book.findOne({_id: req.params.id})
+    .then((book) => {
+      console.log("book", book);
+      if (book.ratings.some(rating => rating.userId === req.body.userId) ) {
+        // parcourir le tableau des ratings et vérifier que dans le tableau,
+        // il n'y ait pas déjà une note donnée par le user req.auth.userId
+        // array ratings vérifier
+        res.status(500).json({ error: 'Rating not authorized. User had already asigned a grade.' });
+      }
+
+      if (req.body.grade < 1 || req.body.grade > 5) {
+        res.status(500).json({ error: 'Rating not authorized. Grade must be included between 1 and 5' });
+      }
+
+      console.log("body", req.body)
+      console.log("rating", req.body.grade)
+      // je push pas le bon truc peut-être pas au bon endroit, peut-être pas comme il faut et que ça prend peut-être du temps
+      // il manque _id dans l'objet rating quand je push et le grade ne correspond pas
+
+      book.ratings.push(req.body);
+      // nouvelle moyenne des notes
+      // const totalRatings = book.ratings.length;
+      // const sumOfRatings = book.ratings.reduce((acc, rating) => acc + rating.rating, 0);
+      // book.averageRating = sumOfRatings / totalRatings;
+      // Sauvegarde le livre
+      book.save()
+      .then(book => {
+          res.status(200).json(book);
+      })
+      .catch(error => res.status(500).json({ error }));
+
+    })
+    .catch((error) => {
+      res.status(400).json({ error });
+    });
+  }
+};
+
+
 exports.modifyBook = (req, res, next) => {
   const bookObject = req.file ? {
     ...JSON.parse(req.body.book),
@@ -27,11 +79,11 @@ exports.modifyBook = (req, res, next) => {
   Book.findOne({_id: req.params.id})
     .then((book) => {
       if (book.userId != req.auth.userId) {
-          res.status(401).json({ message : 'Not authorized'});
+        res.status(401).json({ message : 'Not authorized'});
       } else {
-          Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
-          .then(() => res.status(200).json({message : 'Objet modifié!'}))
-          .catch(error => res.status(401).json({ error }));
+        Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
+        .then(() => res.status(200).json({message : 'Objet modifié!'}))
+        .catch(error => res.status(401).json({ error }));
       }
     })
     .catch((error) => {

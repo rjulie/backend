@@ -11,5 +11,6 @@ router.put('/:id', auth, sharpMulter, booksCtrl.modifyBook);
 router.delete('/:id', auth, booksCtrl.deleteBook);
 router.get('/:id', booksCtrl.getOneBook);
 router.get('/', booksCtrl.getAllBooks);
+router.post('/:id/rating', auth, booksCtrl.createRating);
 
 module.exports = router;
