@@ -20,7 +20,6 @@ exports.createBook = (req, res, next) => {
 
 exports.createRating = (req, res, next) => {
   console.log("body", req.body)
-  console.log("rating", req.body.grade)
   console.log("user", req.body.userId)
   console.log("auth", req.auth.userId)
 
@@ -49,12 +48,14 @@ exports.createRating = (req, res, next) => {
       // je push pas le bon truc peut-être pas au bon endroit, peut-être pas comme il faut et que ça prend peut-être du temps
       // il manque _id dans l'objet rating quand je push et le grade ne correspond pas
 
-      book.ratings.push(req.body);
+      const newRating = { userId: req.body.userId, grade: req.body.rating};
+      book.ratings.push(newRating);
       // nouvelle moyenne des notes
       // const totalRatings = book.ratings.length;
       // const sumOfRatings = book.ratings.reduce((acc, rating) => acc + rating.rating, 0);
       // book.averageRating = sumOfRatings / totalRatings;
       // Sauvegarde le livre
+      console.log("rating", book.ratings)
       book.save()
       .then(book => {
           res.status(200).json(book);
