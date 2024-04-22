@@ -28,8 +28,9 @@ exports.createRating = (req, res, next) => {
 
   if (user != req.auth.userId) {
     res.status(401).json({ message : 'Not authorized'});
-  } else {
-    Book.findOne({_id: req.params.id})
+  }
+
+  Book.findOne({_id: req.params.id})
     .then((book) => {
       console.log("book", book);
       if (book.ratings.some(rating => rating.userId === req.body.userId) ) {
@@ -48,14 +49,17 @@ exports.createRating = (req, res, next) => {
       // je push pas le bon truc peut-être pas au bon endroit, peut-être pas comme il faut et que ça prend peut-être du temps
       // il manque _id dans l'objet rating quand je push et le grade ne correspond pas
 
-      const newRating = { userId: req.body.userId, grade: req.body.rating};
+      const newRating = { userId: req.auth.userId, grade: req.body.rating};
       book.ratings.push(newRating);
+
       // nouvelle moyenne des notes
-      // const totalRatings = book.ratings.length;
-      // const sumOfRatings = book.ratings.reduce((acc, rating) => acc + rating.rating, 0);
-      // book.averageRating = sumOfRatings / totalRatings;
+      const numberOfRatings = book.ratings.length;
+      const sumOfRatings = book.ratings.reduce((acc, rating) => acc + rating.grade, 0);
+      book.averageRating = sumOfRatings / numberOfRatings;
       // Sauvegarde le livre
       console.log("rating", book.ratings)
+      console.log("average", book.averageRating)
+
       book.save()
       .then(book => {
           res.status(200).json(book);
@@ -66,7 +70,6 @@ exports.createRating = (req, res, next) => {
     .catch((error) => {
       res.status(400).json({ error });
     });
-  }
 };
 
 
