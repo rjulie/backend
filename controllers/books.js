@@ -33,10 +33,7 @@ exports.createRating = (req, res, next) => {
   Book.findOne({_id: req.params.id})
     .then((book) => {
       console.log("book", book);
-      if (book.ratings.some(rating => rating.userId === req.body.userId) ) {
-        // parcourir le tableau des ratings et vérifier que dans le tableau,
-        // il n'y ait pas déjà une note donnée par le user req.auth.userId
-        // array ratings vérifier
+      if (book.ratings.some(rating => rating.userId === req.auth.userId) ) {
         res.status(500).json({ error: 'Rating not authorized. User had already asigned a grade.' });
       }
 
@@ -46,9 +43,6 @@ exports.createRating = (req, res, next) => {
 
       console.log("body", req.body)
       console.log("rating", req.body.grade)
-      // je push pas le bon truc peut-être pas au bon endroit, peut-être pas comme il faut et que ça prend peut-être du temps
-      // il manque _id dans l'objet rating quand je push et le grade ne correspond pas
-
       const newRating = { userId: req.auth.userId, grade: req.body.rating};
       book.ratings.push(newRating);
 
