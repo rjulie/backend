@@ -122,7 +122,9 @@ exports.getAllBooks = (req, res, next) => {
 
 exports.getBestrating = (req, res, next) => {
   // renvoie un tableau des 3 meilleurs averageRating
-  Book.find().sort([['averageRating', -1]].limit(3))
+  Book.find()
+    .sort({averageRating: -1})
+    .limit(3)
   .then(books => res.status(200).json(books))
   .catch(error => res.status(400).json({ error }));
 };
