@@ -5,9 +5,6 @@ const newFilenameFunction = (og_filename, options) => {
   const newname =
     og_filename.split(".").slice(0, -1).join(".")
     + "-" + Date.now() + "." + options.fileFormat;
-  console.log("OG", og_filename);
-  console.log("format", options.fileFormat);
-  console.log("name", newname)
   return newname;
 };
 
