@@ -2,7 +2,6 @@ const Book = require('../models/Book');
 const fs = require('fs');
 
 exports.createBook = (req, res, next) => {
-  console.log("TEST", req.file)
   const bookOject = JSON.parse(req.body.book);
   delete bookOject._id;
   delete bookOject._userId;
@@ -19,11 +18,6 @@ exports.createBook = (req, res, next) => {
 
 
 exports.createRating = (req, res, next) => {
-  console.log("body", req.body)
-  console.log("user", req.body.userId)
-  console.log("auth", req.auth.userId)
-
-
   const user = req.body.userId;
 
   if (user != req.auth.userId) {
@@ -41,18 +35,12 @@ exports.createRating = (req, res, next) => {
         res.status(500).json({ error: 'Rating not authorized. Grade must be included between 1 and 5' });
       }
 
-      console.log("body", req.body)
-      console.log("rating", req.body.grade)
       const newRating = { userId: req.auth.userId, grade: req.body.rating};
       book.ratings.push(newRating);
 
-      // nouvelle moyenne des notes
       const numberOfRatings = book.ratings.length;
       const sumOfRatings = book.ratings.reduce((acc, rating) => acc + rating.grade, 0);
       book.averageRating = sumOfRatings / numberOfRatings;
-      // Sauvegarde le livre
-      console.log("rating", book.ratings)
-      console.log("average", book.averageRating)
 
       book.save()
       .then(book => {
