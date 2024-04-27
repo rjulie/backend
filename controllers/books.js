@@ -109,7 +109,6 @@ exports.getAllBooks = (req, res, next) => {
 };
 
 exports.getBestrating = (req, res, next) => {
-  // renvoie un tableau des 3 meilleurs averageRating
   Book.find()
     .sort({averageRating: -1})
     .limit(3)
